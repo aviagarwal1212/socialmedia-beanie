@@ -24,8 +24,6 @@ class CreatePost(BaseModel):
 class UpdatePost(BaseModel):
     tweet: Optional[str]
     published: Optional[bool]
-    owner_id: Optional[PydanticObjectId]
-    created_at: Optional[datetime]
 
 
 class OutPost(BaseModel):

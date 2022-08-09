@@ -11,7 +11,7 @@ router = APIRouter(prefix="/posts", tags=["Posts"])
 
 @router.get("/", response_model=List[OutPost])
 async def get_posts(current_user: User = Depends(oauth2.get_current_user)):
-    posts = await Post.find_all().to_list()
+    posts = await Post.find(Post.owner_id == current_user.id).to_list()
     return posts
 
 
@@ -33,6 +33,11 @@ async def get_post(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=f"Post with id {id} not found"
         )
+    if post.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Not authorized to perform requested action",
+        )
     return post
 
 
@@ -45,6 +50,11 @@ async def delete_post(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=f"Post with id {id} not found"
         )
+    if post.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Not authorized to perform requested action",
+        )
     _ = await post.delete()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -56,11 +66,18 @@ async def update_post(
     current_user: User = Depends(oauth2.get_current_user),
 ):
     post = await Post.get(id)
+    print(post)
     if not post:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=f"Post with id {id} not found"
         )
+    if post.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Not authorized to perform requested action",
+        )
     post_data = pydantic_encoder.encode_input(post_data)
+    print(post_data)
     _ = await post.update({"$set": post_data})
     updated_post = await Post.get(id)
     return updated_post

@@ -19,3 +19,7 @@ class OutUser(BaseModel):
     id: PydanticObjectId = Field(..., alias="_id")
     email: EmailStr
     created_at: datetime
+
+
+class RefUser(BaseModel):
+    email: EmailStr

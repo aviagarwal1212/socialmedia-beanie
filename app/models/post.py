@@ -1,15 +1,17 @@
-from ast import alias
 from datetime import datetime
 from typing import Optional
 
-from beanie import Document, PydanticObjectId
+from beanie import Document, Link, PydanticObjectId
 from pydantic import BaseModel, Field
+
+from .user import RefUser, User
 
 
 class Post(Document):
     tweet: str
     published: bool = True
-    owner_id: PydanticObjectId
+    owner: Link[User]
+    votes: int = 0
     created_at: datetime = datetime.now()
 
     class Settings:
@@ -30,5 +32,6 @@ class OutPost(BaseModel):
     id: PydanticObjectId = Field(..., alias="_id")
     tweet: str
     published: bool
-    owner_id: PydanticObjectId
+    owner: RefUser
+    votes: int
     created_at: datetime

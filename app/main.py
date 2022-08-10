@@ -1,12 +1,13 @@
 from fastapi import FastAPI
 
 from .config.database import init_db
-from .routers import auth, post, user
+from .routers import auth, post, user, vote
 
 app = FastAPI()
 app.include_router(post.router)
 app.include_router(user.router)
 app.include_router(auth.router)
+app.include_router(vote.router)
 
 
 @app.on_event("startup")
